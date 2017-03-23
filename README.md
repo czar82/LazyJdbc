@@ -6,19 +6,19 @@ A tool to easily call pl/sql function from Java using a jdbc connection.
 
 Import as Maven project. Extend with your DAO class the LazyJdbcDAO, and implements in your bean the interface that you need (Take a look at the two VO example). Now you can call your PL/SQL:
 
-List<WorkExperience> workExperiences = yourDAO.genericFunction4arrayType(
-		jdbcConnectionToYourDatasource, 
-		"yourDataBaseUser.yourPackage.yourPLSQLFunction", 
-		"yourDataBaseUser.yourCustomType", WorkExperience.class,
-		yourInputForPLSQL, otherOptionalInput);
-		
-List<Person> people = yourDAO.genericFunction4refCursor(
-		jdbcConnectionToYourDatasource, 
-		"yourDataBaseUser.yourPackage.yourPLSQLFunction", Person.class,
-		yourInputForPLSQL, otherOptionalInput);
+	List<WorkExperience> workExperiences = yourDAO.genericFunction4arrayType(
+			jdbcConnectionToYourDatasource, 
+			"yourDataBaseUser.yourPackage.yourPLSQLFunction", 
+			"yourDataBaseUser.yourCustomType", WorkExperience.class,
+			yourInputForPLSQL, otherOptionalInput);
+			
+	List<Person> people = yourDAO.genericFunction4refCursor(
+			jdbcConnectionToYourDatasource, 
+			"yourDataBaseUser.yourPackage.yourPLSQLFunction", Person.class,
+			yourInputForPLSQL, otherOptionalInput);
 
-//in this example no input parameter will be passed to PL/SQL:
-String s = yourDAO.genericFunction4Object(jdbcConnectionToYourDatasource, functionName, String.class, null);
+	//in this example no input parameter will be passed to PL/SQL:
+	String s = yourDAO.genericFunction4Object(jdbcConnectionToYourDatasource, functionName, String.class, null);
 
 
 ## Contacts
