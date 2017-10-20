@@ -1,5 +1,6 @@
 package com.noware.lazyjdbc;
 
+
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -9,6 +10,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Struct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,6 +18,8 @@ import oracle.jdbc.driver.OracleTypes;
 import oracle.sql.ARRAY;
 
 import org.apache.log4j.Logger;
+
+import com.noware.lazyjdbc.parameter.PlsqlParameter;
 
 /**
  * Extends this abstract class to from your DAO. 
@@ -25,11 +29,9 @@ import org.apache.log4j.Logger;
  */
 public abstract class LazyJdbcDAO
 {
-	public Logger log = Logger.getLogger(this.getClass().getName());
-	private HashMap<Class<?>, Integer> oracleMap;
-	
-	public LazyJdbcDAO() {
-		super();
+	public static Logger log = Logger.getLogger("it.sian.appsianagea.lazyjdbc.LazyJdbcDAO: ");
+	private static HashMap<Class<?>, Integer> oracleMap;
+	static {
 		//Only the main OracleTypes are mapped, add below
 		//others OracleTypes that you need.
 		oracleMap = new HashMap<Class<?>, Integer>();
@@ -50,7 +52,7 @@ public abstract class LazyJdbcDAO
 	 * @return						An int corresponding to the {@link OracleTypes}.
 	 * @throws RuntimeException		If the Class type is not mapped an exception is thrown.
 	 */
-	public <T> int getOracleTypes(Class<T> t) throws RuntimeException
+	public static <T> int getOracleTypes(Class<T> t) throws RuntimeException
 	{
 		Integer value = oracleMap.get(t);
 		if (value==null)
@@ -68,7 +70,7 @@ public abstract class LazyJdbcDAO
 	 * @return				{@link ArrayList} of T objects.
 	 * @throws Exception
 	 */
-	protected <T extends Arrayable> List<T> getListFromSqlArray(Array ar, Class<T> t) throws Exception
+	public static <T extends Arrayable> List<T> getListFromSqlArray(Array ar, Class<T> t) throws Exception
 	{
 		log.debug("in getListFromSqlArray ");
 		T listElement = null;
@@ -278,6 +280,72 @@ public abstract class LazyJdbcDAO
 		}
 		return returnList;		
 	}
+
+
+	/**
+	 * Call a given pl/sql procedure 
+	 * 
+	 * @param conn				Database jdbc connection.
+	 * @param functionName		Pl/sql funcion name (eg: name_schema.name_package.name_function).
+	 * @param oracleTypeName	Custom {@link ARRAY} name to be mapped (eg: name_schema.name_custom_type).
+	 * @param t					Class type element to be returned. Must implements {@link Arrayable}.
+	 * @param queryParams		Varargs with the input and output parameters  {@link PlsqlParameter} for pl/sql (can be null if there are no parameters).
+	 * @throws Exception
+	 */	
+	public void genericProcedure(Connection conn, String functionName, PlsqlParameter ... queryParams)  throws Exception
+	{
+		CallableStatement cstm = null;
+		
+		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
+		StringBuilder sb = new StringBuilder("{call " + functionName + "(");
+		if (!paramEmpty)
+		{
+			for (int i=0; i<queryParams.length; i++)
+			{
+				sb.append("?,");
+			}
+			if (queryParams.length>0)
+			{
+				sb.deleteCharAt(sb.length()-1);
+			}
+		}
+		sb.append(")}");
+
+		try
+		{
+			cstm = conn.prepareCall(sb.toString());
+			int i=1;
+			if (!paramEmpty)
+			{
+				for (PlsqlParameter ob:queryParams)
+				{
+					ob.setParameter(i++, cstm);
+				}
+			}
+			
+			cstm.execute();
+			if (!paramEmpty)
+			{
+				i=1;
+				for (PlsqlParameter ob:queryParams)
+				{
+					ob.getItemFromStatement(i++, cstm);
+				}
+			}
+		} 
+		catch (Exception e)
+		{
+			if (queryParams!=null)
+			{
+				log.error("queryParam: " + Arrays.toString(queryParams) + " pl:" + sb.toString());
+			}
+			throw e;
+
+		} finally
+		{
+			cstm.close();
+		}
+	}	
 	
 	
 }
