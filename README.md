@@ -8,18 +8,29 @@ Import as Maven project. Extend with your DAO class the LazyJdbcDAO, and impleme
 
 	List<WorkExperience> workExperiences = yourDAO.genericFunction4arrayType(
 			jdbcConnectionToYourDatasource, 
-			"yourDataBaseUser.yourPackage.yourPLSQLFunction", 
-			"yourDataBaseUser.yourCustomType", WorkExperience.class,
+			"yourSchema.yourPackage.yourPLSQLFunction", 
+			"yourSchema.yourCustomType", WorkExperience.class,
 			yourInputForPLSQL, otherOptionalInput);
 			
 	List<Person> people = yourDAO.genericFunction4refCursor(
 			jdbcConnectionToYourDatasource, 
-			"yourDataBaseUser.yourPackage.yourPLSQLFunction", Person.class,
+			"yourSchema.yourPackage.yourPLSQLFunction", Person.class,
 			yourInputForPLSQL, otherOptionalInput);
 
 	//in this example no input parameter will be passed to PL/SQL:
-	String s = yourDAO.genericFunction4Object(jdbcConnectionToYourDatasource, functionName, String.class, null);
+	String s = yourDAO.genericFunction4Object("yourSchema.yourPackage.yourPLSQLFunction", functionName, String.class, null);
 
+	//in this example this procedure have one numeric input, an Oracle.ARRAY and a text description as output and a date as input.
+	//you must respect the order of your plsql parameter
+	ListItem<WorkExperience> listItem = new ListItem<WorkExperience>(WorkExperience.class, "yourSchema.yourCustomType");
+	SingleItem<String> description = new SingleItem<String>(String.class);
+	yourDAO.genericProcedure(conn, "cabaad031_ps.estraiConsTerr", 
+			new InPlsqlParameter<Integer>(1234),
+			new OutPlsqlParameter(listItem),
+			new OutPlsqlParameter(description),
+			new InPlsqlParameter<java.sql.Date>(today)
+			);
+	
 
 ## Contacts
 
