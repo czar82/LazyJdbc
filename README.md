@@ -24,7 +24,7 @@ Import as Maven project. Extend with your DAO class the LazyJdbcDAO, and impleme
 	//you must respect the order of your plsql parameter
 	ListItem<WorkExperience> listItem = new ListItem<WorkExperience>(WorkExperience.class, "yourSchema.yourCustomType");
 	SingleItem<String> description = new SingleItem<String>(String.class);
-	yourDAO.genericProcedure(conn, "cabaad031_ps.estraiConsTerr", 
+	yourDAO.genericProcedure(conn, "yourSchema.yourPackage.yourPLSQLProcedure", 
 			new InPlsqlParameter<Integer>(1234),
 			new OutPlsqlParameter(listItem),
 			new OutPlsqlParameter(description),
