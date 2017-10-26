@@ -52,4 +52,9 @@ public class SingleItem <T> extends ItemContainer<T> {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return item!=null ? item.toString() : "";
+	}
+
 }

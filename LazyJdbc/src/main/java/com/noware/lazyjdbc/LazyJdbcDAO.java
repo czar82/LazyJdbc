@@ -1,6 +1,5 @@
 package com.noware.lazyjdbc;
 
-
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -146,10 +145,7 @@ public abstract class LazyJdbcDAO
 			}
 		} catch (Exception e)
 		{
-			if (queryParams!=null)
-			{
-				log.error("queryParam: " + queryParams.toString() + " pl:" + sb.toString());
-			}
+			traceErrorLog(e, sb, queryParams);
 			throw e;
 
 		} finally
@@ -209,10 +205,7 @@ public abstract class LazyJdbcDAO
 //			return cstm.getObject(1, t);
 		} catch (Exception e)
 		{
-			if (queryParams!=null)
-			{
-				log.error("queryParam: " + queryParams.toString() + " pl:" + sb.toString());
-			}
+			traceErrorLog(e, sb, queryParams);
 			throw e;
 
 		} finally
@@ -268,10 +261,7 @@ public abstract class LazyJdbcDAO
 			returnList = getListFromSqlArray(cstm.getArray(1), t);
 		} catch (Exception e)
 		{
-			if (queryParams!=null)
-			{
-				log.error("queryParam: " + queryParams.toString() + " pl:" + sb.toString());
-			}
+			traceErrorLog(e, sb, queryParams);
 			throw e;
 
 		} finally
@@ -335,10 +325,7 @@ public abstract class LazyJdbcDAO
 		} 
 		catch (Exception e)
 		{
-			if (queryParams!=null)
-			{
-				log.error("queryParam: " + Arrays.toString(queryParams) + " pl:" + sb.toString());
-			}
+			traceErrorLog(e, sb, (Object[])queryParams);
 			throw e;
 
 		} finally
@@ -347,5 +334,14 @@ public abstract class LazyJdbcDAO
 		}
 	}	
 	
+	private void traceErrorLog(Exception e, StringBuilder functionName, Object ... queryParams)
+	{
+		log.error("ERROR: " + e.getMessage());
+		log.error(" plsql: " + functionName.toString());			
+		if (queryParams!=null)
+		{
+			log.error("queryParam: " + Arrays.toString(queryParams));
+		}
+	}
 	
 }

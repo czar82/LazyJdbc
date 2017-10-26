@@ -2,6 +2,7 @@ package com.noware.lazyjdbc.parameter;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 import oracle.jdbc.driver.OracleTypes;
@@ -53,6 +54,11 @@ public class ListItem <T extends Arrayable> extends ItemContainer<T> {
 			CallableStatement cstm) throws Exception {
 		listItem = LazyJdbcDAO.getListFromSqlArray(cstm.getArray(parameterIndex), getGenericClass());
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		return listItem!=null ? Arrays.toString(listItem.toArray()) : "";
 	}
 	
 }
