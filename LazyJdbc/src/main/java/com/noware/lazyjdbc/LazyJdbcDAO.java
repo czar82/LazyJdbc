@@ -150,8 +150,14 @@ public abstract class LazyJdbcDAO
 
 		} finally
 		{
-			rs.close();
-			cstm.close();
+			if (cstm!=null)
+			{
+				if (rs!=null)
+				{
+					rs.close();
+				}
+				cstm.close();
+			}
 		}
 		return returnList;
 	}
@@ -210,7 +216,10 @@ public abstract class LazyJdbcDAO
 
 		} finally
 		{
-			cstm.close();
+			if (cstm!=null)
+			{
+				cstm.close();
+			}
 		}
 	}
 
@@ -266,7 +275,10 @@ public abstract class LazyJdbcDAO
 
 		} finally
 		{
-			cstm.close();
+			if (cstm!=null)
+			{
+				cstm.close();
+			}
 		}
 		return returnList;		
 	}
@@ -330,7 +342,10 @@ public abstract class LazyJdbcDAO
 
 		} finally
 		{
-			cstm.close();
+			if (cstm!=null)
+			{
+				cstm.close();
+			}
 		}
 	}	
 	
