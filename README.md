@@ -11,6 +11,13 @@ Import as Maven project. Extend with your DAO class the LazyJdbcDAO, and impleme
 			"yourSchema.yourPackage.yourPLSQLFunction", 
 			"yourSchema.yourCustomType", WorkExperience.class,
 			yourInputForPLSQL, otherOptionalInput);
+
+	//In this example we use 3 real input: "PlanetEarth!", "100", 15:
+	WorldMap worldMap = yourDAO.genericFunction4multiLevelObject(
+			jdbcConnectionToYourDatasource, 
+			"yourSchema.yourPackage.yourPLSQLFunction", 
+			"yourSchema.yourCustomType", WorldMap.class,
+			"PlanetEarth!", "100", 15);
 			
 	List<Person> people = yourDAO.genericFunction4refCursor(
 			jdbcConnectionToYourDatasource, 

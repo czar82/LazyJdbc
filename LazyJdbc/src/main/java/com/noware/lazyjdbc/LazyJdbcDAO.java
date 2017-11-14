@@ -91,7 +91,60 @@ public abstract class LazyJdbcDAO
 		log.debug("out getListFromSqlArray ");
 		return list;
 	}
+	
+	/**
+	 * Transforms a {@link java.sql.Array} to a multi level object.
+	 * 
+	 * @param ar			Array to inject.
+	 * @param t				Class type. Must implements {@link Arrayable}.
+	 * @return				Multi level object of type T.
+	 * @throws Exception
+	 */
+	public static <T extends Arrayable> T getMultiLevelObjectFromSqlArray(Array ar, Class<T> t) throws Exception
+	{
+		log.debug("in getMultiLevelObjectFromSqlArray ");
+		T multiLevelObject = null;
+		Object[] obj = (Object[]) ar.getArray();
+		if (obj != null)
+		{
+			multiLevelObject = t.newInstance();
+			for (Object curr:obj)
+			{
+				if (curr != null)
+				{
+					multiLevelObject.setObjectFromStruct((Struct) curr);
+				}
+			}
+		}
+		log.debug("out getMultiLevelObjectFromSqlArray ");
+		return multiLevelObject;
+	}
 
+	/**
+	 * Create a query string for a plsql function.
+	 * 
+	 * @param functionName		Function name.
+	 * @param queryParams		Query parameters.
+	 * @return					{@link String} query from given inputs.
+	 */
+	private String getQueryFunction(String functionName, Object ... queryParams) {
+		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
+		StringBuilder sb = new StringBuilder("{? = call " + functionName + "(");
+		if (!paramEmpty)
+		{
+			for (int i=0; i<queryParams.length; i++)
+			{
+				sb.append("?,");
+			}
+			if (queryParams.length>0)
+			{
+				sb.deleteCharAt(sb.length()-1);
+			}
+		}
+		sb.append(")}");
+		return sb.toString();
+	}
+	
 	/**
 	 * Call a given pl/sql that returns a ref cursor and map it to a {@link ArrayList}
 	 *  
@@ -108,24 +161,12 @@ public abstract class LazyJdbcDAO
 		ResultSet rs = null;
 		List<T> returnList = new ArrayList<T>();
 		
+		String query = getQueryFunction(functionName, queryParams);		
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
-		StringBuilder sb = new StringBuilder("{? = call " + functionName + "(");
-		if (!paramEmpty)
-		{
-			for (int i=0; i<queryParams.length; i++)
-			{
-				sb.append("?,");
-			}
-			if (queryParams.length>0)
-			{
-				sb.deleteCharAt(sb.length()-1);
-			}
-		}
-		sb.append(")}");
 
 		try
 		{
-			cstm = conn.prepareCall(sb.toString());
+			cstm = conn.prepareCall(query);
 			int i=1;
 			cstm.registerOutParameter(i++, OracleTypes.CURSOR);
 			if (!paramEmpty)
@@ -145,7 +186,7 @@ public abstract class LazyJdbcDAO
 			}
 		} catch (Exception e)
 		{
-			traceErrorLog(e, sb, queryParams);
+			traceErrorLog(e, query, queryParams);
 			throw e;
 
 		} finally
@@ -177,24 +218,12 @@ public abstract class LazyJdbcDAO
 	{
 		CallableStatement cstm = null;
 
+		String query = getQueryFunction(functionName, queryParams);		
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
-		StringBuilder sb = new StringBuilder("{? = call " + functionName + "(");
-		if (!paramEmpty)
-		{
-			for (int i=0; i<queryParams.length; i++)
-			{
-				sb.append("?,");
-			}
-			if (queryParams.length>0)
-			{
-				sb.deleteCharAt(sb.length()-1);
-			}
-		}
-		sb.append(")}");
 
 		try
 		{
-			cstm = conn.prepareCall(sb.toString());
+			cstm = conn.prepareCall(query);
 			int i=1;
 			cstm.registerOutParameter(i++, getOracleTypes(t));
 			if (!paramEmpty)
@@ -211,7 +240,7 @@ public abstract class LazyJdbcDAO
 //			return cstm.getObject(1, t);
 		} catch (Exception e)
 		{
-			traceErrorLog(e, sb, queryParams);
+			traceErrorLog(e, query, queryParams);
 			throw e;
 
 		} finally
@@ -239,24 +268,12 @@ public abstract class LazyJdbcDAO
 		CallableStatement cstm = null;
 		List<T> returnList = new ArrayList<T>();
 		
+		String query = getQueryFunction(functionName, queryParams);		
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
-		StringBuilder sb = new StringBuilder("{? = call " + functionName + "(");
-		if (!paramEmpty)
-		{
-			for (int i=0; i<queryParams.length; i++)
-			{
-				sb.append("?,");
-			}
-			if (queryParams.length>0)
-			{
-				sb.deleteCharAt(sb.length()-1);
-			}
-		}
-		sb.append(")}");
 
 		try
 		{
-			cstm = conn.prepareCall(sb.toString());
+			cstm = conn.prepareCall(query);
 			int i=1;
 			cstm.registerOutParameter(i++, OracleTypes.ARRAY, oracleTypeName);
 			if (!paramEmpty)
@@ -270,7 +287,7 @@ public abstract class LazyJdbcDAO
 			returnList = getListFromSqlArray(cstm.getArray(1), t);
 		} catch (Exception e)
 		{
-			traceErrorLog(e, sb, queryParams);
+			traceErrorLog(e, query, queryParams);
 			throw e;
 
 		} finally
@@ -281,6 +298,56 @@ public abstract class LazyJdbcDAO
 			}
 		}
 		return returnList;		
+	}
+
+	/**
+	 * Call a given pl/sql that returns an {@link ARRAY} and map it to a multi level object
+	 * (eg.: a T object with inside an {@link HashMap} with an inner  {@link ArrayList}).
+	 * The logic mapping is specified implementing {@link Arrayable}.
+	 * 
+	 * @param conn				Database jdbc connection.
+	 * @param functionName		Pl/sql funcion name (eg: name_schema.name_package.name_function).
+	 * @param oracleTypeName	Custom {@link ARRAY} name to be mapped (eg: name_schema.name_custom_type).
+	 * @param t					Class type element to be returned. Must implements {@link Arrayable}.
+	 * @param queryParams		Varargs with the input parameters for pl/sql (can be null if there are no parameters).
+	 * @return					An object T used to map {@link ARRAY} according to implementation of {@link Arrayable}.
+	 * @throws Exception
+	 */
+	public <T extends Arrayable> T genericFunction4multiLevelObject(Connection conn, String functionName, String oracleTypeName, Class<T> t, Object ... queryParams)  throws Exception
+	{
+		CallableStatement cstm = null;
+		T returnObject;
+		
+		String query = getQueryFunction(functionName, queryParams);		
+		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
+
+		try
+		{
+			cstm = conn.prepareCall(query);
+			int i=1;
+			cstm.registerOutParameter(i++, OracleTypes.ARRAY, oracleTypeName);
+			if (!paramEmpty)
+			{
+				for (Object ob:queryParams)
+				{
+					cstm.setObject(i++, ob);
+				}
+			}
+			cstm.execute();
+			returnObject = getMultiLevelObjectFromSqlArray(cstm.getArray(1), t);
+		} catch (Exception e)
+		{
+			traceErrorLog(e, query, queryParams);
+			throw e;
+
+		} finally
+		{
+			if (cstm!=null)
+			{
+				cstm.close();
+			}
+		}
+		return returnObject;		
 	}
 
 
@@ -337,7 +404,7 @@ public abstract class LazyJdbcDAO
 		} 
 		catch (Exception e)
 		{
-			traceErrorLog(e, sb, (Object[])queryParams);
+			traceErrorLog(e, sb.toString(), (Object[])queryParams);
 			throw e;
 
 		} finally
@@ -349,10 +416,10 @@ public abstract class LazyJdbcDAO
 		}
 	}	
 	
-	private void traceErrorLog(Exception e, StringBuilder functionName, Object ... queryParams)
+	private void traceErrorLog(Exception e, String functionName, Object ... queryParams)
 	{
 		log.error("ERROR: " + e.getMessage());
-		log.error(" plsql: " + functionName.toString());			
+		log.error(" plsql: " + functionName);			
 		if (queryParams!=null)
 		{
 			log.error("queryParam: " + Arrays.toString(queryParams));
