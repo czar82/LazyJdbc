@@ -4,7 +4,8 @@ A tool to easily call pl/sql functions and procedures from Java, using a jdbc co
 
 ## Installation & Usage
 
-Import as Maven project. Use LazyJdbcDAO or extend it with your DAO class, and implements in your bean the interface that you need (Take a look at the two VO example). Now you can call your PL/SQL:
+Import as Maven project. Use LazyJdbcDAO or extend it with your DAO class, and implements in your bean the interface that you need (Have a look to VO example). 
+Done? Now you can call your PL/SQL:
 
 	//This method will return a list from a pl/sql function that returns an OracleTypes.ARRAY.
 	List<WorkExperience> workExperiences = yourDAO.genericFunction4arrayType(
@@ -31,14 +32,14 @@ Import as Maven project. Use LazyJdbcDAO or extend it with your DAO class, and i
 	//This method will return an Object from a pl/sql function.
 	//in this example no input parameter will be passed to PL/SQL:
 	String s = yourDAO.genericFunction4Object("yourSchema.yourPackage.yourPLSQLFunction", functionName, 
-		String.class, null);
+			String.class, null);
 
 	//This method will call a pl/sql procedure.
 	//in this example the procedure have a numeric input, an Oracle.ARRAY and 
 	//a text description as output, and a date as input. Respectively in this order.
 	//You must respect the order of your plsql parameters.
 	ListItem<WorkExperience> listItem = 
-		new ListItem<WorkExperience>(WorkExperience.class, "yourSchema.yourCustomType");
+			new ListItem<WorkExperience>(WorkExperience.class, "yourSchema.yourCustomType");
 	SingleItem<String> description = new SingleItem<String>(String.class);
 	yourDAO.genericProcedure(conn, "yourSchema.yourPackage.yourPLSQLProcedure", 
 			new InPlsqlParameter<Integer>(1234),
