@@ -4,7 +4,7 @@ A tool to easily call pl/sql functions and procedures from Java, using a jdbc co
 
 ## Installation & Usage
 
-Import as Maven project. Extend with your DAO class the LazyJdbcDAO, and implements in your bean the interface that you need (Take a look at the two VO example). Now you can call your PL/SQL:
+Import as Maven project. Use LazyJdbcDAO or extend it with your DAO class, and implements in your bean the interface that you need (Take a look at the two VO example). Now you can call your PL/SQL:
 
 	//This method will return a list from a pl/sql function that returns an OracleTypes.ARRAY.
 	List<WorkExperience> workExperiences = yourDAO.genericFunction4arrayType(

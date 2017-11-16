@@ -21,14 +21,14 @@ import org.apache.log4j.Logger;
 import com.noware.lazyjdbc.parameter.PlsqlParameter;
 
 /**
- * Extends this abstract class to from your DAO. 
+ * Entry class to call plsql function and procedure from java. 
  * 
  * @author https://www.linkedin.com/in/ivandipaola/
  *
  */
-public abstract class LazyJdbcDAO
+public class LazyJdbcDAO
 {
-	public static Logger log = Logger.getLogger("it.sian.appsianagea.lazyjdbc.LazyJdbcDAO: ");
+	public static Logger log = Logger.getLogger("LazyJdbcDAO: ");
 	private static HashMap<Class<?>, Integer> oracleMap;
 	static {
 		//Only the main OracleTypes are mapped, add below
@@ -125,9 +125,9 @@ public abstract class LazyJdbcDAO
 	 * 
 	 * @param functionName		Function name.
 	 * @param queryParams		Query parameters.
-	 * @return					{@link String} query from given inputs.
+	 * @return					{@link StringBuilder} query from given inputs.
 	 */
-	private String getQueryFunction(String functionName, Object ... queryParams) {
+	private StringBuilder getQueryFunction(String functionName, Object ... queryParams) {
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
 		StringBuilder sb = new StringBuilder("{? = call " + functionName + "(");
 		if (!paramEmpty)
@@ -142,7 +142,18 @@ public abstract class LazyJdbcDAO
 			}
 		}
 		sb.append(")}");
-		return sb.toString();
+		return sb;
+	}
+
+	/**
+	 * Create a query string for a plsql procedure.
+	 * 
+	 * @param functionName		Procedure name.
+	 * @param queryParams		Query parameters.
+	 * @return					{@link StringBuilder} query from given inputs.
+	 */
+	private <T> StringBuilder getQueryProcedure(String functionName, T ... queryParams) {
+		return getQueryFunction(functionName, queryParams).delete(1, 5);
 	}
 	
 	/**
@@ -161,7 +172,7 @@ public abstract class LazyJdbcDAO
 		ResultSet rs = null;
 		List<T> returnList = new ArrayList<T>();
 		
-		String query = getQueryFunction(functionName, queryParams);		
+		String query = getQueryFunction(functionName, queryParams).toString();		
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
 
 		try
@@ -218,7 +229,7 @@ public abstract class LazyJdbcDAO
 	{
 		CallableStatement cstm = null;
 
-		String query = getQueryFunction(functionName, queryParams);		
+		String query = getQueryFunction(functionName, queryParams).toString();		
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
 
 		try
@@ -268,7 +279,7 @@ public abstract class LazyJdbcDAO
 		CallableStatement cstm = null;
 		List<T> returnList = new ArrayList<T>();
 		
-		String query = getQueryFunction(functionName, queryParams);		
+		String query = getQueryFunction(functionName, queryParams).toString();		
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
 
 		try
@@ -318,7 +329,7 @@ public abstract class LazyJdbcDAO
 		CallableStatement cstm = null;
 		T returnObject;
 		
-		String query = getQueryFunction(functionName, queryParams);		
+		String query = getQueryFunction(functionName, queryParams).toString();		
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
 
 		try
@@ -365,24 +376,12 @@ public abstract class LazyJdbcDAO
 	{
 		CallableStatement cstm = null;
 		
+		String query = getQueryProcedure(functionName, queryParams).toString();		
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
-		StringBuilder sb = new StringBuilder("{call " + functionName + "(");
-		if (!paramEmpty)
-		{
-			for (int i=0; i<queryParams.length; i++)
-			{
-				sb.append("?,");
-			}
-			if (queryParams.length>0)
-			{
-				sb.deleteCharAt(sb.length()-1);
-			}
-		}
-		sb.append(")}");
 
 		try
 		{
-			cstm = conn.prepareCall(sb.toString());
+			cstm = conn.prepareCall(query);
 			int i=1;
 			if (!paramEmpty)
 			{
@@ -404,7 +403,7 @@ public abstract class LazyJdbcDAO
 		} 
 		catch (Exception e)
 		{
-			traceErrorLog(e, sb.toString(), (Object[])queryParams);
+			traceErrorLog(e, query, (Object[])queryParams);
 			throw e;
 
 		} finally
