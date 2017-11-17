@@ -12,8 +12,6 @@ public abstract class ItemContainer <T> {
 
 	public abstract T getObject();
 
-	public abstract List<T> getList();
-
 	public abstract void setOutParameter(int parameterIndex, CallableStatement cstm) throws SQLException;
 
 	public abstract ItemContainer<T> getObjectFromStatement(int parameterIndex,

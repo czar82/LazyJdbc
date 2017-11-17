@@ -48,11 +48,6 @@ public class SingleItem <T> extends ItemContainer<T> {
 	}
 
 	@Override
-	public List<T> getList() {
-		return null;
-	}
-
-	@Override
 	public String toString() {
 		return item!=null ? item.toString() : "";
 	}

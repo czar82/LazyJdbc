@@ -35,10 +35,10 @@ public class ListItem <T extends Arrayable> extends ItemContainer<T> {
 
 	@Override
 	public T getObject() {
+		//TODO: An OracleTypes.ARRAY created by listItem should be returned.
 		return null;
 	}
 
-	@Override
 	public List<T> getList() {
 		return listItem;
 	}

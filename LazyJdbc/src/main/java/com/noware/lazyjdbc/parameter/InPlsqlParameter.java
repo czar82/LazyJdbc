@@ -26,7 +26,6 @@ public class InPlsqlParameter <T> implements PlsqlParameter {
 	@Override
 	public void setParameter(int parameterIndex, CallableStatement cstm) throws SQLException {
 		cstm.setObject(parameterIndex, item!=null ? item.getObject() : null);
-
 	}
 
 	@Override

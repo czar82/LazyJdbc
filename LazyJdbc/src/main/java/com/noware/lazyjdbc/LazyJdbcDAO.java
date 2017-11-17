@@ -370,6 +370,7 @@ public class LazyJdbcDAO
 	 * @param oracleTypeName	Custom {@link ARRAY} name to be mapped (eg: name_schema.name_custom_type).
 	 * @param t					Class type element to be returned. Must implements {@link Arrayable}.
 	 * @param queryParams		Varargs with the input and output parameters  {@link PlsqlParameter} for pl/sql (can be null if there are no parameters).
+	 * 							Only object are allowed as input parameter (no lists for now). 
 	 * @throws Exception
 	 */	
 	public void genericProcedure(Connection conn, String functionName, PlsqlParameter ... queryParams)  throws Exception
