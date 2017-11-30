@@ -2,9 +2,8 @@ package com.noware.lazyjdbc.parameter;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;
-import java.util.List;
 
-import com.noware.lazyjdbc.LazyJdbcDAO;
+import com.noware.lazyjdbc.LazyJdbcUtility;
 
 
 public class SingleItem <T> extends ItemContainer<T> {
@@ -23,7 +22,7 @@ public class SingleItem <T> extends ItemContainer<T> {
 
 	@Override
 	public int getOracleType() {
-		return LazyJdbcDAO.getOracleTypes(getGenericClass());
+		return LazyJdbcUtility.getOracleTypes(getGenericClass());
 	}
 
 	@Override
