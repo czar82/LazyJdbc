@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import oracle.jdbc.driver.OracleTypes;
-import oracle.sql.ARRAY;
-
 import org.apache.log4j.Logger;
 
 import com.noware.lazyjdbc.parameter.PlsqlParameter;
@@ -20,6 +17,8 @@ import com.noware.lazyjdbc.parameter.PlsqlParameter;
  * 
  * @author https://www.linkedin.com/in/ivandipaola/
  *
+ * @deprecated Use subclass of {@link LazyJdbc} to build the function parameters and call it.
+ * 
  */
 public class LazyJdbcDAO
 {
@@ -34,7 +33,7 @@ public class LazyJdbcDAO
 	 * @return					{@link ArrayList} of T objects.
 	 * @throws Exception
 	 */
-	public <T extends ResultSettable> List<T> genericFunction4refCursor(Connection conn, String functionName, Class<T> t, Object ... queryParams)  throws Exception
+	public static <T extends ResultSettable> List<T> genericFunction4refCursor(Connection conn, String functionName, Class<T> t, Object ... queryParams)  throws Exception
 	{
 		CallableStatement cstm = null;
 		ResultSet rs = null;

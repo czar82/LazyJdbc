@@ -5,10 +5,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import oracle.jdbc.driver.OracleTypes;
-
 import com.noware.lazyjdbc.Arrayable;
 import com.noware.lazyjdbc.LazyJdbcUtility;
+import com.noware.lazyjdbc.OracleTypes;
 
 
 public class ListItem <T extends Arrayable> extends ItemContainer<T> {
@@ -51,7 +50,7 @@ public class ListItem <T extends Arrayable> extends ItemContainer<T> {
 
 	@Override
 	public ItemContainer<T> getObjectFromStatement(int parameterIndex,
-			CallableStatement cstm) throws Exception {
+			CallableStatement cstm) throws SQLException, InstantiationException, IllegalAccessException {
 		listItem = LazyJdbcUtility.getListFromSqlArray(cstm.getArray(parameterIndex), getGenericClass());
 		return this;
 	}

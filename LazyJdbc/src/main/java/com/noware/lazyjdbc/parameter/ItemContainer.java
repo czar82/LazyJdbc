@@ -2,7 +2,6 @@ package com.noware.lazyjdbc.parameter;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;
-import java.util.List;
 
 public abstract class ItemContainer <T> {
 
@@ -15,7 +14,7 @@ public abstract class ItemContainer <T> {
 	public abstract void setOutParameter(int parameterIndex, CallableStatement cstm) throws SQLException;
 
 	public abstract ItemContainer<T> getObjectFromStatement(int parameterIndex,
-			CallableStatement cstm) throws Exception;
+			CallableStatement cstm) throws SQLException, InstantiationException, IllegalAccessException;
 	
 	protected Class<T> getGenericClass(){
         return inferedClass;

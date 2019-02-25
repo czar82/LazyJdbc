@@ -13,13 +13,11 @@ public class OutPlsqlParameter implements PlsqlParameter {
 		this.item = item;
 	}
 
-	@Override
 	public void setParameter(int parameterIndex, CallableStatement cstm) throws SQLException {
 		item.setOutParameter(parameterIndex, cstm);
 	}
 	
-	@Override
-	public ItemContainer<?> getItemFromStatement(int parameterIndex, CallableStatement cstm) throws Exception
+	public ItemContainer<?> getItemFromStatement(int parameterIndex, CallableStatement cstm) throws SQLException, InstantiationException, IllegalAccessException
 	{
 		return item.getObjectFromStatement(parameterIndex, cstm);
 	}

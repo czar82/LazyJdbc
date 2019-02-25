@@ -2,6 +2,7 @@ package com.noware.lazyjdbc.voexample;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Struct;
 import java.util.HashMap;
 
@@ -29,8 +30,7 @@ public class WorldMap implements Serializable, Arrayable {
 	}
 	
 	
-	@Override
-	public void setObjectFromStruct(Struct st) throws Exception {
+	public void setObjectFromStruct(Struct st) throws SQLException {
 		Object[] ob = st.getAttributes();		
 		City city = new City();
 		city.setCityName((String)ob[1]);

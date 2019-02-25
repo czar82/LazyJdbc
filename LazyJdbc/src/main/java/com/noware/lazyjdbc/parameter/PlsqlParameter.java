@@ -9,5 +9,5 @@ public interface PlsqlParameter {
 	public void setParameter(int parameterIndex, CallableStatement cstm) throws SQLException;
 
 	public ItemContainer<?> getItemFromStatement(int parameterIndex,
-			CallableStatement cstm) throws Exception;
+			CallableStatement cstm) throws SQLException, InstantiationException, IllegalAccessException;
 }

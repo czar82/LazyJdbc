@@ -1,5 +1,6 @@
 package com.noware.lazyjdbc;
 
+import java.sql.SQLException;
 import java.sql.Struct;
 
 /**
@@ -17,6 +18,6 @@ public interface Arrayable {
 	 * 						<br>Eg: Object[] ob = st.getAttributes();
 	 * @throws Exception
 	 */
-	public abstract void setObjectFromStruct(Struct st) throws Exception;
+	public abstract void setObjectFromStruct(Struct st) throws SQLException;
 
 }

@@ -23,14 +23,12 @@ public class InPlsqlParameter <T> implements PlsqlParameter {
 		this.item = item;
 	}
 
-	@Override
 	public void setParameter(int parameterIndex, CallableStatement cstm) throws SQLException {
 		cstm.setObject(parameterIndex, item!=null ? item.getObject() : null);
 	}
 
-	@Override
 	public ItemContainer<?> getItemFromStatement(int parameterIndex,
-			CallableStatement cstm) throws Exception {
+			CallableStatement cstm) {
 		return null;
 	}
 

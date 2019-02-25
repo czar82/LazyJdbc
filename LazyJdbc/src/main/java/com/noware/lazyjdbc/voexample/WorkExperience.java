@@ -1,6 +1,7 @@
 package com.noware.lazyjdbc.voexample;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.sql.Struct;
 import java.util.Date;
 
@@ -20,7 +21,7 @@ public class WorkExperience implements Serializable, Arrayable {
 	private String company;
 	private String role;
 	
-	public void setObjectFromStruct(Struct st) throws Exception {
+	public void setObjectFromStruct(Struct st) throws SQLException {
 		//The fields in the array are returned in the same order of the
 		//PL/SQL function
 		Object[] ob = st.getAttributes();

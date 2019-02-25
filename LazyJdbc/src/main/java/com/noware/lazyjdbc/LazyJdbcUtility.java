@@ -4,14 +4,13 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.sql.Struct;
 import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
-import oracle.jdbc.driver.OracleTypes;
 
 import org.apache.log4j.Logger;
 
@@ -62,9 +61,11 @@ public class LazyJdbcUtility
 	 * @param ar			Array to inject.
 	 * @param t				Class type. Must implements {@link Arrayable}.
 	 * @return				{@link ArrayList} of T objects.
-	 * @throws Exception
+	 * @throws SQLException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	public static <T extends Arrayable> List<T> getListFromSqlArray(Array ar, Class<T> t) throws Exception
+	public static <T extends Arrayable> List<T> getListFromSqlArray(Array ar, Class<T> t) throws SQLException, InstantiationException, IllegalAccessException
 	{
 		log.debug("in getListFromSqlArray ");
 		T listElement = null;
@@ -94,9 +95,11 @@ public class LazyJdbcUtility
 	 * @param t					Class type. Must implements {@link Arrayable}.
 	 * @param outputCollection	{@link AbstractCollection} of T objects, must be not null.
 	 * 							The array will be inject here.
-	 * @throws Exception
+	 * @throws SQLException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	protected static <T extends Arrayable> void getAbstractCollectionFromSqlArray(Array ar, Class<T> t, AbstractCollection<T> outputCollection) throws Exception
+	protected static <T extends Arrayable> void getAbstractCollectionFromSqlArray(Array ar, Class<T> t, AbstractCollection<T> outputCollection) throws SQLException, InstantiationException, IllegalAccessException
 	{
 		log.debug("in getAbstractCollectionFromSqlArray ");
 		T listElement = null;
@@ -122,9 +125,11 @@ public class LazyJdbcUtility
 	 * @param ar			Array to inject.
 	 * @param t				Class type. Must implements {@link Arrayable}.
 	 * @return				Multi level object of type T.
-	 * @throws Exception
+	 * @throws SQLException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 */
-	public static <T extends Arrayable> T getMultiLevelObjectFromSqlArray(Array ar, Class<T> t) throws Exception
+	public static <T extends Arrayable> T getMultiLevelObjectFromSqlArray(Array ar, Class<T> t) throws SQLException, InstantiationException, IllegalAccessException
 	{
 		log.debug("in getMultiLevelObjectFromSqlArray ");
 		T multiLevelObject = null;
@@ -150,6 +155,8 @@ public class LazyJdbcUtility
 	 * @param functionName		Function name.
 	 * @param queryParams		Query parameters.
 	 * @return					{@link StringBuilder} query from given inputs.
+	 * 
+	 * @deprecated
 	 */
 	protected static StringBuilder getQueryFunction(String functionName, Object ... queryParams) {
 		boolean paramEmpty = queryParams.length==1 && queryParams[0]==null;
@@ -170,17 +177,54 @@ public class LazyJdbcUtility
 	}
 
 	/**
+	 * Create a query string for a plsql function.
+	 * 
+	 * @param functionName		Function name.
+	 * @param queryParams		Query parameters.
+	 * @return					{@link StringBuilder} query from given inputs.
+	 */
+	protected static StringBuilder getQueryFunction(String functionName, List<Object> queryParams) {
+		StringBuilder sb = new StringBuilder("{? = call " + functionName + "(");
+		if (queryParams!=null && !queryParams.isEmpty())
+		{
+			for (int i=0; i<queryParams.size(); i++)
+			{
+				sb.append("?,");
+			}
+			if (queryParams.size()>0)
+			{
+				sb.deleteCharAt(sb.length()-1);
+			}
+		}
+		sb.append(")}");
+		return sb;
+	}
+
+	/**
+	 * Create a query string for a plsql procedure.
+	 * 
+	 * @param functionName		Procedure name.
+	 * @param queryParams		Query parameters.
+	 * @return					{@link StringBuilder} query from given inputs.
+	 * 
+	 * @deprecated
+	 */
+	protected static <T> StringBuilder getQueryProcedure(String functionName, T ... queryParams) {
+		return getQueryFunction(functionName, queryParams).delete(1, 5);
+	}
+
+	/**
 	 * Create a query string for a plsql procedure.
 	 * 
 	 * @param functionName		Procedure name.
 	 * @param queryParams		Query parameters.
 	 * @return					{@link StringBuilder} query from given inputs.
 	 */
-	protected static <T> StringBuilder getQueryProcedure(String functionName, T ... queryParams) {
+	protected static <T> StringBuilder getQueryProcedure(String functionName, List<T> queryParams) {
 		return getQueryFunction(functionName, queryParams).delete(1, 5);
 	}
 	
-	protected static void traceErrorLog(Exception e, String functionName, Object ... queryParams)
+	protected static void traceErrorLog(Throwable e, String functionName, Object ... queryParams)
 	{
 		log.error("ERROR: " + e.getMessage());
 		log.error(" plsql: " + functionName);			

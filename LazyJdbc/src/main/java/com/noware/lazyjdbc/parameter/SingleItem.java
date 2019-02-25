@@ -37,11 +37,10 @@ public class SingleItem <T> extends ItemContainer<T> {
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public ItemContainer<T> getObjectFromStatement(int parameterIndex, CallableStatement cstm) throws SQLException {
-		item = (T)cstm.getObject(parameterIndex);
+//		item = (T)cstm.getObject(parameterIndex);
 		//You can use this from JDK 1.7:
-		//cstm.getObject(1, t);
+		item = cstm.getObject(parameterIndex, inferedClass);
 		
 		return this;
 	}

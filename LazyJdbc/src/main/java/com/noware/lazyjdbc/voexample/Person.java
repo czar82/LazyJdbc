@@ -2,6 +2,7 @@ package com.noware.lazyjdbc.voexample;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 
 import com.noware.lazyjdbc.ResultSettable;
@@ -21,7 +22,7 @@ public class Person implements ResultSettable, Serializable {
 	private String telephone;
 	
 	
-	public <T> void setObjectFromResulSet(ResultSet rs) throws Exception {
+	public <T> void setObjectFromResulSet(ResultSet rs) throws SQLException {
 		//get the column from database:
 		setId(rs.getInt("ID_PERSON"));
 		setName(rs.getString("NAME"));

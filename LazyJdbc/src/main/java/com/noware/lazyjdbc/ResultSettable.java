@@ -1,6 +1,7 @@
 package com.noware.lazyjdbc;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Implements this interface to inject the {@link java.sql.ResultSet} in your class. 
@@ -17,6 +18,6 @@ public interface ResultSettable {
 	 * 						<br>Eg: this.personName = rs.getString("NAME");
 	 * @throws Exception
 	 */
-	public abstract <T> void setObjectFromResulSet(ResultSet rs) throws Exception;
+	public abstract <T> void setObjectFromResulSet(ResultSet rs) throws SQLException;
 	
 }
