@@ -5,6 +5,7 @@ A tool to easily call pl/sql functions and procedures from Java, using a jdbc co
 ## Installation & Usage
 
 Import as Maven project. You can use JitPack: https://jitpack.io/#czar82/LazyJdbc/java1.8-SNAPSHOT 
+
 Use LazyJdbc subclasses, and implements in your bean the interface that you need (Have a look to VO example). 
 Done? Now you can call your PL/SQL:
 
