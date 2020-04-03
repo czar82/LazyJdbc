@@ -4,49 +4,58 @@ A tool to easily call pl/sql functions and procedures from Java, using a jdbc co
 
 ## Installation & Usage
 
-Import as Maven project. Use LazyJdbcDAO or extend it with your DAO class, and implements in your bean the interface that you need (Have a look to VO example). 
+Import as Maven project. You can use JitPack: https://jitpack.io/#czar82/LazyJdbc/java1.8-SNAPSHOT 
+
+Use LazyJdbc subclasses, and implements in your bean the interface that you need (Have a look to VO example). 
 Done? Now you can call your PL/SQL:
 
 	//This method will return a list from a pl/sql function that returns an OracleTypes.ARRAY.
-	List<WorkExperience> workExperiences = yourDAO.genericFunction4arrayType(
-			jdbcConnectionToYourDatasource, 
-			"yourSchema.yourPackage.yourPLSQLFunction", 
-			"yourSchema.yourCustomType", WorkExperience.class,
-			yourInputForPLSQL, otherOptionalInput);
+	LazyFunction4OracleType func = LazyFunction4OracleType.builder()
+			.connection(jdbcConnectionToYourDatasource)
+			.functionName("yourSchema.yourPackage.yourPLSQLFunction")
+			.oracleTypeName("yourSchema.yourCustomType")
+			.queryParam(yourInputValueForPLSQL).build();
+	List<WorkExperience> workExperiences = func.genericFunction4arrayType(WorkExperience.class);
 
 	//This method will return an object (that contains the data structure that you choose), from a 
 	//pl/sql function that returns an OracleTypes.ARRAY.
-	//In this example we use 3 real input: "PlanetEarth!", "100", 15:
-	WorldMap worldMap = yourDAO.genericFunction4multiLevelObject(
-			jdbcConnectionToYourDatasource, 
-			"yourSchema.yourPackage.yourPLSQLFunction", 
-			"yourSchema.yourCustomType", WorldMap.class,
-			"PlanetEarth!", "100", 15);
+	//In this example we use 2 strings and a number as input: "PlanetEarth!", "100", 15:
+	LazyFunction4OracleType func = LazyFunction4OracleType.builder()
+			.connection(jdbcConnectionToYourDatasource)
+			.functionName("yourSchema.yourPackage.yourPLSQLFunction")
+			.oracleTypeName("yourSchema.yourCustomType")
+			.queryParam("PlanetEarth!").queryParam("100").queryParam(15).build();
+	WorldMap worldMap = func.genericFunction4multiLevelObject(WorldMap.class);
 			
 	//This method will return a list from a pl/sql function that returns an OracleTypes.CURSOR.
-	List<Person> people = yourDAO.genericFunction4refCursor(
-			jdbcConnectionToYourDatasource, 
-			"yourSchema.yourPackage.yourPLSQLFunction", Person.class,
-			yourInputForPLSQL, otherOptionalInput);
+	LazyFunction func = LazyFunction.builder()
+			.connection(jdbcConnectionToYourDatasource)
+			.functionName("yourSchema.yourPackage.yourPLSQLFunction")
+			.queryParam(yourInputForPLSQL).build();
+	List<Person> people = func.genericFunction4refCursor(Person.class);
 
 	//This method will return an Object from a pl/sql function.
-	//in this example no input parameter will be passed to PL/SQL:
-	String s = yourDAO.genericFunction4Object("yourSchema.yourPackage.yourPLSQLFunction", functionName, 
-			String.class, null);
+	//in this example the PL/SQL function haven't any parameter, so we'll not use .queryParam:
+	LazyFunction func = LazyFunction.builder()
+			.connection(jdbcConnectionToYourDatasource)
+			.functionName("yourSchema.yourPackage.yourPLSQLFunction")
+			.build();
+	String s = func.genericFunction4Object(String.class);
 
 	//This method will call a pl/sql procedure.
 	//in this example the procedure have a numeric input, an Oracle.ARRAY and 
 	//a text description as output, and a date as input. Respectively in this order.
 	//You must respect the order of your plsql parameters.
-	ListItem<WorkExperience> listItem = 
-			new ListItem<WorkExperience>(WorkExperience.class, "yourSchema.yourCustomType");
-	SingleItem<String> description = new SingleItem<String>(String.class);
-	yourDAO.genericProcedure(conn, "yourSchema.yourPackage.yourPLSQLProcedure", 
-			new InPlsqlParameter<Integer>(1234),
-			new OutPlsqlParameter(listItem),
-			new OutPlsqlParameter(description),
-			new InPlsqlParameter<java.sql.Date>(today)
-			);
+	List<Foo> listItem = new ArrayList<>();
+	LazyProcedure proc = LazyProcedure.builder()
+			.connection(jdbcConnectionToYourDatasource)
+			.functionName("yourSchema.yourPackage.yourPLSQLProcedure")
+			.queryParam(new InPlsqlParameter<Integer>(1234))
+			.queryParam(new OutPlsqlParameter(listItem))
+			.queryParam(new OutPlsqlParameter(description))
+			.queryParam(new InPlsqlParameter<java.sql.Date>(today))
+			.build();
+	proc.genericProcedure();
 	
 
 ## Contacts
