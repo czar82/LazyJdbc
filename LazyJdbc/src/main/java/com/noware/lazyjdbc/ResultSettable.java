@@ -17,6 +17,6 @@ public interface ResultSettable {
 	 * 						<br>Eg: this.personName = rs.getString("NAME");
 	 * @throws Exception
 	 */
-	public abstract <T> void setObjectFromResulSet(ResultSet rs) throws Exception;
+	public abstract void setObjectFromResulSet(ResultSet rs) throws Exception;
 	
 }

@@ -21,7 +21,7 @@ public class Person implements ResultSettable, Serializable {
 	private String telephone;
 	
 	
-	public <T> void setObjectFromResulSet(ResultSet rs) throws Exception {
+	public void setObjectFromResulSet(ResultSet rs) throws Exception {
 		//get the column from database:
 		setId(rs.getInt("ID_PERSON"));
 		setName(rs.getString("NAME"));
