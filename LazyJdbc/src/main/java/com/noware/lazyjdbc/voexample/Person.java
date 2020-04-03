@@ -22,7 +22,7 @@ public class Person implements ResultSettable, Serializable {
 	private String telephone;
 	
 	
-	public <T> void setObjectFromResulSet(ResultSet rs) throws SQLException {
+	public void setObjectFromResulSet(ResultSet rs) throws SQLException {
 		//get the column from database:
 		setId(rs.getInt("ID_PERSON"));
 		setName(rs.getString("NAME"));
