@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import com.noware.lazyjdbc.parameter.PlsqlParameter;
 
 /**
@@ -22,7 +20,6 @@ import com.noware.lazyjdbc.parameter.PlsqlParameter;
  */
 public class LazyJdbcDAO
 {
-	public static Logger log = Logger.getLogger("LazyJdbcDAO: ");
 	/**
 	 * Call a given pl/sql that returns a ref cursor and map it to a {@link ArrayList}
 	 *  
